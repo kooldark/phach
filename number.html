@@ -15,6 +15,16 @@
             font-family: 'Comic Sans MS', 'Arial', sans-serif;
             overflow: hidden;
             user-select: none;
+            touch-action: manipulation;
+        }
+
+        /* Respect user's motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         .container {
@@ -297,61 +307,62 @@
     </style>
 </head>
 <body>
-    <a href="menu.html" class="home-btn" title="Quay lại menu">🏠</a>
+    <a href="menu.html" class="home-btn" title="Quay lại menu" aria-label="Return to home menu">🏠</a>
     
     <div class="container">
-        <div class="card-area" id="cardArea">
+        <div class="card-area" id="cardArea" role="main" aria-label="Number card display area">
             <div class="card" id="card">
-                <div class="number" id="number">1</div>
-                <div class="name" id="name">MỘT</div>
-                <div class="animals" id="animals"></div>
+                <div class="number" id="number" aria-label="Number">1</div>
+                <div class="name" id="name" aria-label="Number name">MỘT</div>
+                <div class="animals" id="animals" role="img" aria-label="Visual count"></div>
             </div>
         </div>
 
-        <div class="controls">
-            <button class="btn" id="prevBtn">⬅️ Trước</button>
-            <button class="btn" id="playBtn">▶️ Tự động</button>
-            <div class="counter" id="counter">1/10</div>
-            <button class="btn" id="nextBtn">Sau ➡️</button>
+        <div class="controls" role="group" aria-label="Playback controls">
+            <button class="btn" id="prevBtn" aria-label="Show previous number">⬅️ Trước</button>
+            <button class="btn" id="playBtn" aria-label="Play or pause automatic rotation" aria-expanded="false">▶️ Tự động</button>
+            <div class="counter" id="counter" role="status" aria-live="polite">1/10</div>
+            <button class="btn" id="nextBtn" aria-label="Show next number">Sau ➡️</button>
         </div>
 
-        <button class="settings-btn" id="settingsBtn">⚙️</button>
+        <button class="settings-btn" id="settingsBtn" aria-label="Open settings" aria-expanded="false" aria-controls="settingsPanel">⚙️</button>
     </div>
 
     <div class="overlay" id="overlay"></div>
 
-    <div class="settings-panel" id="settingsPanel">
-        <h2>⚙️ Cài Đặt</h2>
+    <div class="settings-panel" id="settingsPanel" role="dialog" aria-labelledby="settingsTitle">
+        <h2 id="settingsTitle">⚙️ Cài Đặt</h2>
         
         <div class="setting-item">
-            <label>⏱️ Thời gian mỗi thẻ: <span class="value-display" id="timeValue">4s</span></label>
-            <input type="range" id="timeRange" min="2" max="10" value="4" step="1">
+            <label for="timeRange">⏱️ Thời gian mỗi thẻ: <span class="value-display" id="timeValue">4s</span></label>
+            <input type="range" id="timeRange" min="2" max="10" value="4" step="1" aria-label="Card display duration">
         </div>
 
         <div class="setting-item">
-            <label>🔀 Chế độ hiển thị:</label>
-            <select id="modeSelect">
+            <label for="modeSelect">🔀 Chế độ hiển thị:</label>
+            <select id="modeSelect" aria-label="Display mode selection">
                 <option value="sequential">Sequential (1→2→3...)</option>
                 <option value="random">Random (Ngẫu nhiên)</option>
             </select>
         </div>
 
         <div class="setting-item">
-            <label>🔊 Âm thanh: <span class="value-display" id="soundValue">Bật</span></label>
-            <input type="checkbox" id="soundCheck" checked>
+            <label for="soundCheck">🔊 Âm thanh: <span class="value-display" id="soundValue">Bật</span></label>
+            <input type="checkbox" id="soundCheck" checked aria-label="Toggle sound effects">
         </div>
 
         <div class="setting-item">
-            <label>✨ Animation: <span class="value-display" id="animValue">Bật</span></label>
-            <input type="checkbox" id="animCheck" checked>
+            <label for="animCheck">✨ Animation: <span class="value-display" id="animValue">Bật</span></label>
+            <input type="checkbox" id="animCheck" checked aria-label="Toggle animations">
         </div>
 
         <div class="setting-item">
-            <label>🚀 Tốc độ animation: <span class="value-display" id="speedValue">0.7x</span></label>
-            <input type="range" id="speedRange" min="0.5" max="2" value="0.7" step="0.1">
+            <label for="speedRange">🚀 Tốc độ animation: <span class="value-display" id="speedValue">1x</span></label>
+            <input type="range" id="speedRange" min="0.5" max="2" value="1" step="0.1" aria-label="Animation speed">
         </div>
     </div>
 
+    <script src="settings.js"></script>
     <script>
         const data = [
             { number: 1, name: 'MỘT', animals: ['🐶'] },
@@ -380,13 +391,9 @@
         let currentIndex = 0;
         let isPlaying = false;
         let autoInterval = null;
-        let settings = {
-            time: 4,
-            mode: 'sequential',
-            sound: true,
-            animation: true,
-            speed: 0.7
-        };
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let audioContext = null;
 
         const cardArea = document.getElementById('cardArea');
         const card = document.getElementById('card');
@@ -411,23 +418,57 @@
         const speedRange = document.getElementById('speedRange');
         const speedValue = document.getElementById('speedValue');
 
+        // Initialize with sync settings
+        function initSettings() {
+            const mgr = window.settingsManager;
+            timeRange.value = mgr.get('cardDuration');
+            timeValue.textContent = mgr.get('cardDuration') + 's';
+            modeSelect.value = mgr.get('mode');
+            soundCheck.checked = mgr.get('soundEnabled');
+            soundValue.textContent = mgr.get('soundEnabled') ? 'Bật' : 'Tắt';
+            animCheck.checked = mgr.get('animationEnabled');
+            animValue.textContent = mgr.get('animationEnabled') ? 'Bật' : 'Tắt';
+            speedRange.value = mgr.get('animationSpeed');
+            speedValue.textContent = mgr.get('animationSpeed') + 'x';
+            
+            // Listen for settings changes
+            window.settingsManager.onChange(syncExternalSettings);
+        }
+
+        // Sync when settings change from other tabs/windows
+        function syncExternalSettings(settings) {
+            timeRange.value = settings.cardDuration;
+            timeValue.textContent = settings.cardDuration + 's';
+            modeSelect.value = settings.mode;
+            soundCheck.checked = settings.soundEnabled;
+            soundValue.textContent = settings.soundEnabled ? 'Bật' : 'Tắt';
+            animCheck.checked = settings.animationEnabled;
+            animValue.textContent = settings.animationEnabled ? 'Bật' : 'Tắt';
+            speedRange.value = settings.animationSpeed;
+            speedValue.textContent = settings.animationSpeed + 'x';
+        }
+
+        initSettings();
+
         function showCard(index, animate = true) {
             const item = data[index];
+            const mgr = window.settingsManager;
             
-            if (animate && settings.animation) {
+            if (animate && mgr.get('animationEnabled')) {
                 card.classList.add('slide-out');
                 setTimeout(() => {
                     updateCardContent(item, index);
                     card.classList.remove('slide-out');
                     card.classList.add('slide-in');
-                    setTimeout(() => card.classList.remove('slide-in'), 500 * settings.speed);
-                }, 500 * settings.speed);
+                    setTimeout(() => card.classList.remove('slide-in'), 500 * mgr.get('animationSpeed'));
+                }, 500 * mgr.get('animationSpeed'));
             } else {
                 updateCardContent(item, index);
             }
         }
 
         function updateCardContent(item, index) {
+            const mgr = window.settingsManager;
             numberEl.textContent = item.number;
             nameEl.textContent = item.name;
             animalsEl.innerHTML = '';
@@ -436,43 +477,52 @@
                 const span = document.createElement('span');
                 span.className = 'animal';
                 span.textContent = animal;
-                span.style.animationDelay = `${i * 0.1 * settings.speed}s`;
-                if (!settings.animation) span.style.animation = 'none';
+                span.style.animationDelay = `${i * 0.1 * mgr.get('animationSpeed')}s`;
+                if (!mgr.get('animationEnabled')) span.style.animation = 'none';
                 animalsEl.appendChild(span);
             });
 
             counterEl.textContent = `${index + 1}/10`;
             cardArea.style.background = gradients[index % gradients.length];
 
-            if (settings.sound) {
+            if (mgr.get('soundEnabled')) {
                 playSound(item.number);
             }
         }
 
+        // Unified audio context with better sound
+        function getAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
         function playSound(num) {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            const ctx = getAudioContext();
+            const oscillator = ctx.createOscillator();
+            const gainNode = ctx.createGain();
             
             oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            gainNode.connect(ctx.destination);
             
             oscillator.frequency.value = 400 + (num * 50);
             oscillator.type = 'sine';
             
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
             
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
+            oscillator.start(ctx.currentTime);
+            oscillator.stop(ctx.currentTime + 0.5);
         }
 
         function nextCard() {
-            if (settings.mode === 'random') {
+            const mgr = window.settingsManager;
+            if (mgr.get('mode') === 'random') {
                 let newIndex;
                 do {
                     newIndex = Math.floor(Math.random() * 10);
-                } while (newIndex === currentIndex); // Tránh chọn lại số hiện tại
+                } while (newIndex === currentIndex);
                 currentIndex = newIndex;
             } else {
                 currentIndex = (currentIndex + 1) % 10;
@@ -487,15 +537,44 @@
 
         function togglePlay() {
             isPlaying = !isPlaying;
+            const mgr = window.settingsManager;
             if (isPlaying) {
                 playBtn.textContent = '⏸️ Dừng';
-                autoInterval = setInterval(nextCard, settings.time * 1000);
+                playBtn.setAttribute('aria-expanded', 'true');
+                autoInterval = setInterval(nextCard, mgr.get('cardDuration') * 1000);
             } else {
                 playBtn.textContent = '▶️ Tự động';
+                playBtn.setAttribute('aria-expanded', 'false');
                 clearInterval(autoInterval);
             }
         }
 
+        // Touch gesture handlers
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+        }
+
+        function handleTouchEnd(e) {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const diffX = touchStartX - touchEndX;
+            const diffY = Math.abs(touchStartY - touchEndY);
+
+            if (Math.abs(diffX) > diffY && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    nextCard();
+                } else {
+                    prevCard();
+                }
+            }
+        }
+
+        // Event listeners
         playBtn.addEventListener('click', togglePlay);
         nextBtn.addEventListener('click', () => {
             if (isPlaying) togglePlay();
@@ -509,39 +588,49 @@
         settingsBtn.addEventListener('click', () => {
             settingsPanel.classList.add('open');
             overlay.classList.add('show');
+            settingsBtn.setAttribute('aria-expanded', 'true');
         });
 
         overlay.addEventListener('click', () => {
             settingsPanel.classList.remove('open');
             overlay.classList.remove('show');
+            settingsBtn.setAttribute('aria-expanded', 'false');
         });
 
+        // Touch handlers
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+        document.addEventListener('touchend', handleTouchEnd, false);
+
+        // Settings change handlers
         timeRange.addEventListener('input', (e) => {
-            settings.time = parseInt(e.target.value);
-            timeValue.textContent = `${settings.time}s`;
+            const val = parseInt(e.target.value);
+            window.settingsManager.set('cardDuration', val);
+            timeValue.textContent = `${val}s`;
             if (isPlaying) {
                 clearInterval(autoInterval);
-                autoInterval = setInterval(nextCard, settings.time * 1000);
+                autoInterval = setInterval(nextCard, val * 1000);
             }
         });
 
         modeSelect.addEventListener('change', (e) => {
-            settings.mode = e.target.value;
+            window.settingsManager.set('mode', e.target.value);
         });
 
         soundCheck.addEventListener('change', (e) => {
-            settings.sound = e.target.checked;
-            soundValue.textContent = settings.sound ? 'Bật' : 'Tắt';
+            window.settingsManager.set('soundEnabled', e.target.checked);
+            soundValue.textContent = e.target.checked ? 'Bật' : 'Tắt';
         });
 
         animCheck.addEventListener('change', (e) => {
-            settings.animation = e.target.checked;
-            animValue.textContent = settings.animation ? 'Bật' : 'Tắt';
+            window.settingsManager.set('animationEnabled', e.target.checked);
+            animValue.textContent = e.target.checked ? 'Bật' : 'Tắt';
         });
 
         speedRange.addEventListener('input', (e) => {
-            settings.speed = parseFloat(e.target.value);
-            speedValue.textContent = `${settings.speed}x`;
+            const val = parseFloat(e.target.value);
+            window.settingsManager.set('animationSpeed', val);
+            speedValue.textContent = `${val}x`;
         });
 
         showCard(0, false);

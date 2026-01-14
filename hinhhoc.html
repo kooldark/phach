@@ -15,6 +15,16 @@
             overflow: hidden;
             background: linear-gradient(135deg, #FFF9E6 0%, #E6F7FF 100%);
             font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            touch-action: manipulation;
+        }
+
+        /* Respect user's motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         .container {
@@ -437,13 +447,13 @@
     </style>
 </head>
 <body>
-    <a href="menu.html" class="home-btn" title="Quay lại menu">🏠</a>
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+    <a href="menu.html" class="home-btn" title="Quay lại menu" aria-label="Return to home menu">🏠</a>
+    <button class="settings-btn" onclick="openSettings()" aria-label="Open settings" aria-expanded="false" aria-controls="settingsModal">⚙️</button>
 
     <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
+    <div class="modal" id="settingsModal" role="dialog" aria-labelledby="settingsModalTitle">
         <div class="modal-content">
-            <h2>⚙️ Cài Đặt Phụ Huynh</h2>
+            <h2 id="settingsModalTitle">⚙️ Cài Đặt Phụ Huynh</h2>
             
             <div class="settings-option">
                 <label>Tự Động Chuyển</label>
@@ -471,72 +481,73 @@
         <!-- Màn hình chủ -->
         <div class="screen home-screen active">
             <div class="title">🎨 Bé Học Hình & Màu 🎨</div>
-            <button class="menu-btn shapes-btn" onclick="startShapes()">🔷 Hình Dạng</button>
-            <button class="menu-btn colors-btn" onclick="startColors()">🎨 Màu Sắc</button>
-            <button class="menu-btn mix-btn" onclick="startMix()">🎪 Mix</button>
+            <button class="menu-btn shapes-btn" onclick="startShapes()" aria-label="Learn about shapes">🔷 Hình Dạng</button>
+            <button class="menu-btn colors-btn" onclick="startColors()" aria-label="Learn about colors">🎨 Màu Sắc</button>
+            <button class="menu-btn mix-btn" onclick="startMix()" aria-label="Learn mixed shapes and colors">🎪 Mix</button>
         </div>
 
         <!-- Màn hình học hình dạng -->
         <div class="screen shapes-screen">
             <div class="learning-screen">
                 <h1>Hình Dạng</h1>
-                <div class="display-area">
+                <div class="display-area" role="main" aria-label="Shape display area">
                     <div class="shape-container">
-                        <div class="shape-large" id="shapeEmoji"></div>
-                        <div class="shape-name" id="shapeName"></div>
+                        <div class="shape-large" id="shapeEmoji" aria-label="Shape"></div>
+                        <div class="shape-name" id="shapeName" aria-label="Shape name"></div>
                         <div class="shape-color-info" id="shapeColor"></div>
                     </div>
                 </div>
-                <div class="progress-dots" id="shapeDots"></div>
+                <div class="progress-dots" id="shapeDots" role="status" aria-label="Progress indicators"></div>
                 <div class="controls">
-                    <button class="btn btn-prev" onclick="prevShape()">◀ Trước</button>
-                    <button class="btn btn-random" onclick="randomShape()">🎲 Random</button>
-                    <button class="btn btn-next" onclick="nextShape()">Sau ▶</button>
+                    <button class="btn btn-prev" onclick="prevShape()" aria-label="Show previous shape">◀ Trước</button>
+                    <button class="btn btn-random" onclick="randomShape()" aria-label="Show random shape">🎲 Random</button>
+                    <button class="btn btn-next" onclick="nextShape()" aria-label="Show next shape">Sau ▶</button>
                 </div>
             </div>
-            <button class="btn btn-home" onclick="goHome()">🏠 Trang Chủ</button>
+            <button class="btn btn-home" onclick="goHome()" aria-label="Go back to home">🏠 Trang Chủ</button>
         </div>
 
         <!-- Màn hình học màu sắc -->
         <div class="screen colors-screen">
             <div class="learning-screen">
                 <h1>Màu Sắc</h1>
-                <div class="display-area">
+                <div class="display-area" role="main" aria-label="Color display area">
                     <div class="shape-container">
-                        <div class="shape-large" id="colorEmoji"></div>
-                        <div class="shape-name" id="colorName"></div>
-                        <div class="shape-color-info" id="colorCode"></div>
+                        <div class="shape-large" id="colorEmoji" aria-label="Color indicator"></div>
+                        <div class="shape-name" id="colorName" aria-label="Color name"></div>
+                        <div class="shape-color-info" id="colorCode" aria-label="Color code"></div>
                     </div>
                 </div>
-                <div class="progress-dots" id="colorDots"></div>
+                <div class="progress-dots" id="colorDots" role="status" aria-label="Progress indicators"></div>
                 <div class="controls">
-                    <button class="btn btn-prev" onclick="prevColor()">◀ Trước</button>
-                    <button class="btn btn-random" onclick="randomColor()">🎲 Random</button>
-                    <button class="btn btn-next" onclick="nextColor()">Sau ▶</button>
+                    <button class="btn btn-prev" onclick="prevColor()" aria-label="Show previous color">◀ Trước</button>
+                    <button class="btn btn-random" onclick="randomColor()" aria-label="Show random color">🎲 Random</button>
+                    <button class="btn btn-next" onclick="nextColor()" aria-label="Show next color">Sau ▶</button>
                 </div>
             </div>
-            <button class="btn btn-home" onclick="goHome()">🏠 Trang Chủ</button>
+            <button class="btn btn-home" onclick="goHome()" aria-label="Go back to home">🏠 Trang Chủ</button>
         </div>
 
         <!-- Màn hình học mix hình dạng với màu sắc -->
         <div class="screen mix-screen">
             <div class="learning-screen">
                 <h1>Hình & Màu Mix</h1>
-                <div class="display-area">
+                <div class="display-area" role="main" aria-label="Mixed shape and color display area">
                     <div class="shape-container">
-                        <div class="shape-large" id="mixEmoji"></div>
-                        <div class="shape-name" id="mixShapeName"></div>
-                        <div class="shape-color-info" id="mixColorName"></div>
+                        <div class="shape-large" id="mixEmoji" aria-label="Combined shape"></div>
+                        <div class="shape-name" id="mixShapeName" aria-label="Shape name"></div>
+                        <div class="shape-color-info" id="mixColorName" aria-label="Color information"></div>
                     </div>
                 </div>
                 <div class="controls">
-                    <button class="btn btn-random" onclick="randomMix()" style="flex: 1; max-width: 200px;">🎲 Random Nữa</button>
+                    <button class="btn btn-random" onclick="randomMix()" style="flex: 1; max-width: 200px;" aria-label="Show another random combination">🎲 Random Nữa</button>
                 </div>
             </div>
-            <button class="btn btn-home" onclick="goHome()">🏠 Trang Chủ</button>
+            <button class="btn btn-home" onclick="goHome()" aria-label="Go back to home">🏠 Trang Chủ</button>
         </div>
     </div>
 
+    <script src="settings.js"></script>
     <script>
         // Dữ liệu hình dạng
         const shapes = [
@@ -564,33 +575,24 @@
         let currentColorIndex = 0;
         let currentMixShape = 0;
         let currentMixColor = 0;
-        let autoPlayEnabled = false;
-        let randomModeEnabled = false;
-        let autoPlaySpeed = 3;
         let autoPlayInterval = null;
-        let currentScreen = 'shapes'; // track which screen we're on
+        let currentScreen = 'shapes';
+        let audioContext = null;
+        let touchStartX = 0;
+        let touchStartY = 0;
 
         // Load settings from localStorage
         function loadSettings() {
             const saved = localStorage.getItem('kidAppSettings');
             if (saved) {
                 const settings = JSON.parse(saved);
-                autoPlayEnabled = settings.autoPlay || false;
-                randomModeEnabled = settings.randomMode || false;
-                autoPlaySpeed = settings.speed || 3;
-                
-                updateSettingsUI();
+                // Use settings if needed for other features
             }
         }
 
         // Save settings to localStorage
         function saveSettings() {
-            const settings = {
-                autoPlay: autoPlayEnabled,
-                randomMode: randomModeEnabled,
-                speed: autoPlaySpeed
-            };
-            localStorage.setItem('kidAppSettings', JSON.stringify(settings));
+            localStorage.setItem('kidAppSettings', JSON.stringify({}));
         }
 
         // Update settings UI
@@ -601,54 +603,86 @@
             const speedSlider = document.getElementById('speedSlider');
             const speedValue = document.getElementById('speedValue');
 
-            if (autoPlayEnabled) {
-                autoPlayToggle.classList.add('active');
-                speedControlDiv.style.display = 'flex';
-            } else {
+            if (autoPlayToggle.classList.contains('active')) {
                 autoPlayToggle.classList.remove('active');
                 speedControlDiv.style.display = 'none';
-            }
-
-            if (randomModeEnabled) {
-                randomToggle.classList.add('active');
             } else {
-                randomToggle.classList.remove('active');
+                autoPlayToggle.classList.add('active');
+                speedControlDiv.style.display = 'flex';
             }
 
-            speedSlider.value = autoPlaySpeed;
-            speedValue.textContent = autoPlaySpeed + 's';
+            speedSlider.value = 3;
+            speedValue.textContent = '3s';
         }
 
         function openSettings() {
             document.getElementById('settingsModal').classList.add('active');
+            document.querySelector('.settings-btn').setAttribute('aria-expanded', 'true');
         }
 
         function closeSettings() {
             document.getElementById('settingsModal').classList.remove('active');
+            document.querySelector('.settings-btn').setAttribute('aria-expanded', 'false');
             saveSettings();
-            startAutoPlayIfEnabled();
         }
 
         function toggleAutoPlay() {
-            autoPlayEnabled = !autoPlayEnabled;
-            updateSettingsUI();
+            const autoPlayToggle = document.getElementById('autoPlayToggle');
+            autoPlayToggle.classList.toggle('active');
+            if (autoPlayToggle.classList.contains('active')) {
+                document.getElementById('speedControlDiv').style.display = 'flex';
+                startAutoPlayIfEnabled();
+            } else {
+                document.getElementById('speedControlDiv').style.display = 'none';
+                stopAutoPlay();
+            }
         }
 
         function toggleRandom() {
-            randomModeEnabled = !randomModeEnabled;
-            updateSettingsUI();
+            const randomToggle = document.getElementById('randomToggle');
+            randomToggle.classList.toggle('active');
         }
 
         function updateSpeed() {
             const speedSlider = document.getElementById('speedSlider');
             const speedValue = document.getElementById('speedValue');
-            autoPlaySpeed = parseInt(speedSlider.value);
-            speedValue.textContent = autoPlaySpeed + 's';
+            const newSpeed = parseInt(speedSlider.value);
+            speedValue.textContent = newSpeed + 's';
             
-            if (autoPlayEnabled && autoPlayInterval) {
+            if (document.getElementById('autoPlayToggle').classList.contains('active') && autoPlayInterval) {
                 clearInterval(autoPlayInterval);
                 startAutoPlayIfEnabled();
             }
+        }
+
+        function getAudioContext() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioContext;
+        }
+
+        function playSuccessSound() {
+            const ctx = getAudioContext();
+            const notes = [523, 659, 784]; // C5, E5, G5
+            
+            notes.forEach((freq, i) => {
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                oscillator.frequency.value = freq;
+                oscillator.type = 'sine';
+                
+                const startTime = ctx.currentTime + (i * 0.1);
+                gainNode.gain.setValueAtTime(0.3, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + 0.2);
+            });
         }
 
         function startAutoPlayIfEnabled() {
@@ -656,25 +690,53 @@
                 clearInterval(autoPlayInterval);
             }
 
-            if (!autoPlayEnabled) return;
+            if (!document.getElementById('autoPlayToggle').classList.contains('active')) return;
+
+            const speedSlider = document.getElementById('speedSlider');
+            const speed = parseInt(speedSlider.value);
+            const isRandom = document.getElementById('randomToggle').classList.contains('active');
 
             autoPlayInterval = setInterval(() => {
-                if (randomModeEnabled) {
-                    if (currentScreen === 'shapes') randomShape();
-                    else if (currentScreen === 'colors') randomColor();
-                    else if (currentScreen === 'mix') randomMix();
-                } else {
-                    if (currentScreen === 'shapes') nextShape();
-                    else if (currentScreen === 'colors') nextColor();
-                    else if (currentScreen === 'mix') randomMix();
+                if (currentScreen === 'shapes') {
+                    isRandom ? randomShape() : nextShape();
+                } else if (currentScreen === 'colors') {
+                    isRandom ? randomColor() : nextColor();
+                } else if (currentScreen === 'mix') {
+                    randomMix();
                 }
-            }, autoPlaySpeed * 1000);
+            }, speed * 1000);
         }
 
         function stopAutoPlay() {
             if (autoPlayInterval) {
                 clearInterval(autoPlayInterval);
                 autoPlayInterval = null;
+            }
+        }
+
+        // Touch handlers
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchEnd(e) {
+            const touchEndX = e.changedTouches[0].screenX;
+            const touchEndY = e.changedTouches[0].screenY;
+            const diffX = touchStartX - touchEndX;
+            const diffY = Math.abs(touchStartY - touchEndY);
+
+            if (Math.abs(diffX) > diffY && Math.abs(diffX) > 50) {
+                if (diffX > 0) {
+                    // Swipe left -> next
+                    if (currentScreen === 'shapes') nextShape();
+                    else if (currentScreen === 'colors') nextColor();
+                    else if (currentScreen === 'mix') randomMix();
+                } else {
+                    // Swipe right -> previous
+                    if (currentScreen === 'shapes') prevShape();
+                    else if (currentScreen === 'colors') prevColor();
+                }
             }
         }
 
@@ -720,6 +782,7 @@
         function nextShape() {
             currentShapeIndex = (currentShapeIndex + 1) % shapes.length;
             updateShapeDisplay();
+            playSuccessSound();
         }
 
         function prevShape() {
@@ -730,11 +793,13 @@
         function randomShape() {
             currentShapeIndex = Math.floor(Math.random() * shapes.length);
             updateShapeDisplay();
+            playSuccessSound();
         }
 
         function nextColor() {
             currentColorIndex = (currentColorIndex + 1) % colors.length;
             updateColorDisplay();
+            playSuccessSound();
         }
 
         function prevColor() {
@@ -745,12 +810,14 @@
         function randomColor() {
             currentColorIndex = Math.floor(Math.random() * colors.length);
             updateColorDisplay();
+            playSuccessSound();
         }
 
         function randomMix() {
             currentMixShape = Math.floor(Math.random() * shapes.length);
             currentMixColor = Math.floor(Math.random() * colors.length);
             updateMixDisplay();
+            playSuccessSound();
         }
 
         function updateShapeDisplay() {
@@ -790,6 +857,8 @@
         }
 
         // Khởi tạo
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchend', handleTouchEnd, false);
         updateShapeDisplay();
         loadSettings();
     </script>
