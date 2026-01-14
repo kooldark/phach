@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Flash Cards - Animals Edition</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/alphabet.css">
+</head>
+<body>
+    <div class="container" id="container" role="main" aria-label="Flashcard display area"></div>
+    
+    <div class="counter" role="status" aria-label="Current card position" aria-live="polite">
+        <span id="cardCount">1</span> / <span id="cardTotal">26</span>
+    </div>
+    
+    <a href="../index.html" class="home-btn" title="Back to menu" aria-label="Return to home menu">🏠</a>
+    
+    <div class="controls" role="group" aria-label="Playback controls">
+        <button id="prevBtn" class="btn-circle" title="Previous card" aria-label="Show previous card">❮</button>
+        <button id="playBtn" class="btn-circle" title="Play/Pause" aria-label="Play or pause automatic card rotation">▶</button>
+        <button id="nextBtn" class="btn-circle" title="Next card" aria-label="Show next card">❯</button>
+    </div>
+
+    <button class="settings-btn" id="settingsBtn" title="Settings" aria-label="Open settings" aria-expanded="false" aria-controls="settingsPanel">⚙️</button>
+
+    <div class="settings-panel" id="settingsPanel" role="dialog" aria-labelledby="settingsTitle">
+        <button class="close-settings" id="closeSettings" aria-label="Close settings">✕</button>
+        <h2 id="settingsTitle">⚙️ Settings</h2>
+
+        <div class="settings-group">
+            <label for="timerSlider">Card Duration (seconds):
+                <span class="slider-value"><span id="timerValue">4</span>s</span>
+            </label>
+            <input type="range" id="timerSlider" min="2" max="10" value="4" step="1" aria-label="Card display duration in seconds">
+        </div>
+
+        <div class="settings-group">
+            <label for="modeSelect">Display Mode:</label>
+            <select id="modeSelect" aria-label="Choose between sequential or random card display">
+                <option value="sequential">Sequential</option>
+                <option value="random">Random</option>
+            </select>
+        </div>
+
+        <div class="settings-group">
+            <label>
+                <input type="checkbox" id="soundToggle" checked aria-label="Toggle sound effects on or off">
+                Enable Sound Effects
+            </label>
+        </div>
+
+        <div class="settings-group">
+            <label>
+                <input type="checkbox" id="animationToggle" checked aria-label="Toggle card animations on or off">
+                Enable Animations
+            </label>
+        </div>
+
+        <div class="settings-group">
+            <label for="speedMultiplier">Animation Speed:
+                <span class="slider-value" id="speedValue">1x</span>
+            </label>
+            <input type="range" id="speedMultiplier" min="0.5" max="2" value="1" step="0.25" aria-label="Adjust animation playback speed">
+        </div>
+    </div>
+
+    <script src="../js/settings.js"></script>
+    <script src="../js/common.js"></script>
+    <script src="../js/alphabet.js"></script>
+</body>
+</html>

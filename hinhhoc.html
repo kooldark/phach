@@ -104,6 +104,25 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
+
+        @media (max-width: 768px) {
+            .shape {
+                position: relative !important;
+            }
+
+            .container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -111,19 +130,52 @@
 
     <script>
         const shapes = [
-            { type: 'circle', name: 'Hình Tròn', emoji: '🔴', color: '#FF6B9D' },
-            { type: 'square', name: 'Hình Vuông', emoji: '🟦', color: '#4ECDC4' },
-            { type: 'triangle', name: 'Hình Tam Giác', emoji: '🔺', color: '#FFD93D' },
-            { type: 'star', name: 'Ngôi Sao', emoji: '⭐', color: '#FFA07A' },
-            { type: 'heart', name: 'Trái Tim', emoji: '💖', color: '#FF85B3' }
+            { type: 'circle', name: 'Hình Tròn', emoji: '🔴' },
+            { type: 'square', name: 'Hình Vuông', emoji: '🟦' },
+            { type: 'triangle', name: 'Hình Tam Giác', emoji: '🔺' },
+            { type: 'star', name: 'Ngôi Sao', emoji: '⭐' },
+            { type: 'heart', name: 'Trái Tim', emoji: '💖' }
+        ];
+
+        const colors = [
+            '#FF0000',  // Đỏ
+            '#FF8C00',  // Cam
+            '#FFD700',  // Vàng
+            '#00B050',  // Xanh lá
+            '#00B0F0',  // Xanh xương
+            '#9932CC',  // Tím
+            '#000000',  // Đen
+            '#FFFFFF'   // Trắng
         ];
 
         let currentIndex = 0;
         const container = document.getElementById('container');
 
+        function getRandomColor() {
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
         function showShape(index) {
             container.innerHTML = '';
             const shapeData = shapes[index];
+            const randomColor = getRandomColor();
+            
+            // Tính toán kích thước theo màn hình
+            const isMobile = window.innerWidth <= 768;
+            const isSmallMobile = window.innerWidth <= 480;
+            let shapeSize = 200;
+            let labelSize = 48;
+            
+            if (isSmallMobile) {
+                shapeSize = Math.min(120, window.innerWidth * 0.4);
+                labelSize = 28;
+            } else if (isMobile) {
+                shapeSize = Math.min(150, window.innerWidth * 0.35);
+                labelSize = 36;
+            } else {
+                shapeSize = Math.min(200, window.innerWidth * 0.3);
+                labelSize = 48;
+            }
             
             const wrapper = document.createElement('div');
             wrapper.style.cssText = `
@@ -132,6 +184,8 @@
                 left: 50%;
                 transform: translate(-50%, -50%);
                 text-align: center;
+                width: 100%;
+                padding: 20px;
             `;
 
             const shapeElement = document.createElement('div');
@@ -140,33 +194,38 @@
             shapeElement.style.margin = '0 auto 30px';
             
             if (shapeData.type === 'circle') {
-                shapeElement.style.width = '200px';
-                shapeElement.style.height = '200px';
-                shapeElement.style.backgroundColor = shapeData.color;
+                shapeElement.style.width = shapeSize + 'px';
+                shapeElement.style.height = shapeSize + 'px';
+                shapeElement.style.backgroundColor = randomColor;
                 shapeElement.style.borderRadius = '50%';
             } else if (shapeData.type === 'square') {
-                shapeElement.style.width = '200px';
-                shapeElement.style.height = '200px';
-                shapeElement.style.backgroundColor = shapeData.color;
+                shapeElement.style.width = shapeSize + 'px';
+                shapeElement.style.height = shapeSize + 'px';
+                shapeElement.style.backgroundColor = randomColor;
                 shapeElement.style.borderRadius = '20px';
             } else if (shapeData.type === 'triangle') {
-                shapeElement.style.borderLeftWidth = '100px';
-                shapeElement.style.borderRightWidth = '100px';
-                shapeElement.style.borderBottomWidth = '173px';
-                shapeElement.style.borderBottomColor = shapeData.color;
+                const triangleSize = shapeSize / 2;
+                shapeElement.style.borderLeftWidth = triangleSize + 'px';
+                shapeElement.style.borderRightWidth = triangleSize + 'px';
+                shapeElement.style.borderBottomWidth = (triangleSize * 1.732) + 'px';
+                shapeElement.style.borderBottomColor = randomColor;
                 shapeElement.style.borderLeftColor = 'transparent';
                 shapeElement.style.borderRightColor = 'transparent';
             } else if (shapeData.type === 'star' || shapeData.type === 'heart') {
-                shapeElement.style.fontSize = '200px';
+                shapeElement.style.fontSize = shapeSize + 'px';
+                shapeElement.style.color = randomColor;
                 shapeElement.textContent = shapeData.emoji;
+                shapeElement.style.lineHeight = '1';
             }
 
             const label = document.createElement('div');
             label.style.cssText = `
-                font-size: 48px;
+                font-size: ${labelSize}px;
                 color: #333;
                 font-weight: bold;
                 margin-top: 20px;
+                word-wrap: break-word;
+                max-width: 100%;
             `;
             label.textContent = shapeData.name;
 
@@ -176,7 +235,7 @@
         }
 
         function nextShape() {
-            currentIndex = (currentIndex + 1) % shapes.length;
+            currentIndex = Math.floor(Math.random() * shapes.length);
             showShape(currentIndex);
         }
 
@@ -188,6 +247,11 @@
 
         // Nhấn vào màn hình để chuyển hình
         container.addEventListener('click', nextShape);
+
+        // Cập nhật lại khi thay đổi kích thước màn hình
+        window.addEventListener('resize', () => {
+            showShape(currentIndex);
+        });
     </script>
 </body>
 </html>

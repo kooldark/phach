@@ -1,0 +1,416 @@
+/* ============================================
+   COMMON STYLES - Dùng chung toàn ứng dụng
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    touch-action: manipulation;
+    overflow: hidden;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ============================================
+   ANIMATION KEYFRAMES - Tất cả keyframes chung
+   ============================================ */
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(50px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.8) translateY(-50px);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-30px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0px);
+    }
+    to {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes rotate {
+    0%, 100% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(90deg) scale(1.1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1);
+    }
+    75% {
+        transform: rotate(270deg) scale(1.1);
+    }
+}
+
+@keyframes wiggle {
+    0%, 100% {
+        transform: rotate(0deg);
+    }
+    25% {
+        transform: rotate(-15deg) translateX(-10px);
+    }
+    75% {
+        transform: rotate(15deg) translateX(10px);
+    }
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3) rotate(180deg);
+        opacity: 0.7;
+    }
+}
+
+/* ============================================
+   COLOR PALETTE - Màu sắc chung
+   ============================================ */
+
+.color-red {
+    background: linear-gradient(135deg, #FFB3BA 0%, #FFCCCB 100%);
+    color: #C62828;
+}
+
+.color-orange {
+    background: linear-gradient(135deg, #FFCAB0 0%, #FFE0B2 100%);
+    color: #E65100;
+}
+
+.color-yellow {
+    background: linear-gradient(135deg, #FFFACD 0%, #FFFFE0 100%);
+    color: #F57F17;
+}
+
+.color-green {
+    background: linear-gradient(135deg, #B2DFDB 0%, #C8E6C9 100%);
+    color: #00695C;
+}
+
+.color-cyan {
+    background: linear-gradient(135deg, #B3E5FC 0%, #81D4FA 100%);
+    color: #01579B;
+}
+
+.color-blue {
+    background: linear-gradient(135deg, #BBDEFB 0%, #90CAF9 100%);
+    color: #0D47A1;
+}
+
+.color-purple {
+    background: linear-gradient(135deg, #E1BEE7 0%, #F8BBD0 100%);
+    color: #6A1B9A;
+}
+
+.color-pink {
+    background: linear-gradient(135deg, #FFE0F2 0%, #F8BBD0 100%);
+    color: #C2185B;
+}
+
+/* ============================================
+   BUTTON & CONTROLS - Nút chung
+   ============================================ */
+
+button {
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Nút tròn */
+.btn-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    color: #333;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-circle:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Home button */
+.home-btn {
+    position: fixed;
+    left: 30px;
+    bottom: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+.home-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Counter */
+.counter {
+    position: fixed;
+    top: 30px;
+    left: 30px;
+    background: white;
+    padding: 12px 20px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #666;
+}
+
+/* Settings */
+.settings-btn {
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: #333;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 101;
+}
+
+.settings-btn:hover {
+    transform: rotate(20deg) scale(1.1);
+}
+
+.settings-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 102;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.settings-panel.open {
+    transform: translateX(0);
+}
+
+.settings-panel h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.settings-group {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.settings-group label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+}
+
+.settings-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    cursor: pointer;
+}
+
+.settings-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.settings-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.slider-value {
+    display: inline-block;
+    margin-left: auto;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.close-settings {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+}
+
+@media (max-width: 768px) {
+    .home-btn,
+    .counter,
+    .settings-btn {
+        width: 50px;
+        height: 50px;
+    }
+
+    .counter {
+        top: 20px;
+        left: 20px;
+        font-size: 12px;
+    }
+
+    .settings-btn {
+        top: 20px;
+        right: 20px;
+        font-size: 20px;
+    }
+
+    .settings-panel {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-btn,
+    .counter,
+    .settings-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .counter {
+        top: 12px;
+        left: 12px;
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    .settings-btn {
+        top: 12px;
+        right: 12px;
+        font-size: 18px;
+    }
+
+    .settings-panel {
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 15px;
+    }
+
+    .settings-group {
+        margin-bottom: 12px;
+    }
+
+    .settings-group label {
+        font-size: 13px;
+    }
+
+    .settings-group input[type="range"] {
+        width: 100%;
+        height: 5px;
+    }
+
+    .settings-group select {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+
+    .close-settings {
+        font-size: 24px;
+        top: 10px;
+        right: 10px;
+    }
+}
