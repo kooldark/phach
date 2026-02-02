@@ -13,7 +13,7 @@
 
         body {
             overflow: hidden;
-            background: linear-gradient(135deg, #FFE5E5 0%, #E5F3FF 100%);
+            background: #FFFFFF;
             font-family: 'Arial Rounded MT Bold', sans-serif;
         }
 
@@ -129,6 +129,38 @@
     <div class="container" id="container"></div>
 
     <script>
+        // ===== CẤU HÌNH CÀI ĐẶT =====
+        const CONFIG = {
+            // Thời gian chuyển hình (giây)
+            autoChangeInterval: 3000,
+            
+            // Kích thước hình mặc định (px)
+            defaultShapeSize: 200,
+            mobileShapeSize: 150,
+            smallMobileShapeSize: 120,
+            
+            // Kích thước chữ (px)
+            defaultLabelSize: 48,
+            mobileLabelSize: 36,
+            smallMobileLabelSize: 28,
+            
+            // Breakpoint responsive (px)
+            mobileBreakpoint: 768,
+            smallMobileBreakpoint: 480,
+            
+            // Tỷ lệ kích thước theo màn hình
+            desktopSizeRatio: 0.3,
+            mobileSizeRatio: 0.35,
+            smallMobileSizeRatio: 0.4,
+            
+            // Bán kính bo góc cho hình vuông
+            squareBorderRadius: 0,
+            
+            // Tỷ lệ cho tam giác (căn 3)
+            triangleRatio: 1.732
+        };
+        
+        // ===== DỮ LIỆU HÌNH HỌC =====
         const shapes = [
             { type: 'circle', name: 'Hình Tròn', emoji: '🔴' },
             { type: 'square', name: 'Hình Vuông', emoji: '🟦' },
@@ -138,14 +170,14 @@
         ];
 
         const colors = [
-            '#FF0000',  // Đỏ
-            '#FF8C00',  // Cam
-            '#FFD700',  // Vàng
-            '#00B050',  // Xanh lá
-            '#00B0F0',  // Xanh xương
-            '#9932CC',  // Tím
-            '#000000',  // Đen
-            '#FFFFFF'   // Trắng
+            '#FF6B6B',  // Đỏ soft
+            '#D4956E',  // Cam soft
+            '#FFD700',  // Vàng soft
+            '#00DD77',  // Xanh lá soft
+            '#00CCFF',  // Xanh xương soft
+            '#DD77FF',  // Tím soft
+            '#FF69B4',  // Hồng soft
+            '#A9A9A9'   // Xám soft
         ];
 
         let currentIndex = 0;
@@ -161,20 +193,20 @@
             const randomColor = getRandomColor();
             
             // Tính toán kích thước theo màn hình
-            const isMobile = window.innerWidth <= 768;
-            const isSmallMobile = window.innerWidth <= 480;
-            let shapeSize = 200;
-            let labelSize = 48;
+            const isMobile = window.innerWidth <= CONFIG.mobileBreakpoint;
+            const isSmallMobile = window.innerWidth <= CONFIG.smallMobileBreakpoint;
+            let shapeSize = CONFIG.defaultShapeSize;
+            let labelSize = CONFIG.defaultLabelSize;
             
             if (isSmallMobile) {
-                shapeSize = Math.min(120, window.innerWidth * 0.4);
-                labelSize = 28;
+                shapeSize = Math.min(CONFIG.smallMobileShapeSize, window.innerWidth * CONFIG.smallMobileSizeRatio);
+                labelSize = CONFIG.smallMobileLabelSize;
             } else if (isMobile) {
-                shapeSize = Math.min(150, window.innerWidth * 0.35);
-                labelSize = 36;
+                shapeSize = Math.min(CONFIG.mobileShapeSize, window.innerWidth * CONFIG.mobileSizeRatio);
+                labelSize = CONFIG.mobileLabelSize;
             } else {
-                shapeSize = Math.min(200, window.innerWidth * 0.3);
-                labelSize = 48;
+                shapeSize = Math.min(CONFIG.defaultShapeSize, window.innerWidth * CONFIG.desktopSizeRatio);
+                labelSize = CONFIG.defaultLabelSize;
             }
             
             const wrapper = document.createElement('div');
@@ -202,12 +234,12 @@
                 shapeElement.style.width = shapeSize + 'px';
                 shapeElement.style.height = shapeSize + 'px';
                 shapeElement.style.backgroundColor = randomColor;
-                shapeElement.style.borderRadius = '20px';
+                shapeElement.style.borderRadius = CONFIG.squareBorderRadius + 'px';
             } else if (shapeData.type === 'triangle') {
                 const triangleSize = shapeSize / 2;
                 shapeElement.style.borderLeftWidth = triangleSize + 'px';
                 shapeElement.style.borderRightWidth = triangleSize + 'px';
-                shapeElement.style.borderBottomWidth = (triangleSize * 1.732) + 'px';
+                shapeElement.style.borderBottomWidth = (triangleSize * CONFIG.triangleRatio) + 'px';
                 shapeElement.style.borderBottomColor = randomColor;
                 shapeElement.style.borderLeftColor = 'transparent';
                 shapeElement.style.borderRightColor = 'transparent';
@@ -240,10 +272,10 @@
         }
 
         // Hiển thị hình đầu tiên
-        showShape(currentIndex);
+        nextShape();
 
         // Tự động chuyển hình mỗi 3 giây
-        setInterval(nextShape, 3000);
+        setInterval(nextShape, CONFIG.autoChangeInterval);
 
         // Nhấn vào màn hình để chuyển hình
         container.addEventListener('click', nextShape);

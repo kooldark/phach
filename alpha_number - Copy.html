@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Học Chữ & Số - Hiệu Ứng Vẽ Nét</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #f5f7fa; 
+            font-family: sans-serif; 
+            overflow: hidden; 
+            touch-action: manipulation;
+        }
+
+        .container {
+            width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 1s ease;
+        }
+
+        .card {
+            position: absolute; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+        }
+
+        .card.active { opacity: 1; pointer-events: auto; animation: slideIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .card.exit { animation: slideOut 0.5s ease-in forwards; }
+
+        /* SVG Letter Styling */
+        .letter-svg {
+            width: clamp(150px, 40vw, 350px);
+            height: auto;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+        }
+
+        /* Hiệu ứng vẽ từ từ */
+        .draw-path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+        }
+
+        .active .draw-path {
+            animation: draw var(--draw-speed, 4s) linear forwards;
+        }
+
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { to { transform: translateX(-100px); opacity: 0; } }
+
+        .emoji { font-size: clamp(80px, 20vw, 150px); margin-bottom: 20px; }
+        .word { font-size: clamp(30px, 8vw, 60px); font-weight: bold; margin-top: 20px; text-transform: uppercase; }
+        
+        /* Numbers & Animals */
+        .number-text { font-size: 150px; font-weight: 900; }
+        .animals { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .animal { font-size: 50px; animation: bounce 0.6s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+
+        /* UI Controls */
+        .controls { position: fixed; bottom: 30px; display: flex; gap: 20px; z-index: 10; }
+        button { 
+            width: 60px; height: 60px; border-radius: 50%; border: none; 
+            background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+            font-size: 24px; cursor: pointer; 
+        }
+        .counter { position: fixed; top: 20px; left: 20px; background: white; padding: 10px 20px; border-radius: 20px; font-weight: bold; }
+
+        /* Màu sắc */
+        .color-1 { background: #FFB3BA; color: #C62828; }
+        .color-2 { background: #BAFFC9; color: #2E7D32; }
+        .color-3 { background: #BAE1FF; color: #1565C0; }
+        .color-4 { background: #FFFFBA; color: #F57F17; }
+    </style>
+</head>
+<body>
+
+    <div class="counter"><span id="curr">1</span> / <span id="total"></span></div>
+    <div class="container" id="container"></div>
+
+    <div class="controls">
+        <button onclick="prev()">❮</button>
+        <button id="playBtn" onclick="togglePlay()">▶</button>
+        <button onclick="next()">❯</button>
+    </div>
+
+    <script>
+        // Dữ liệu Path SVG cho bảng chữ cái (Tối giản để bé dễ đếm nét)
+        const DATA = [
+            { type: 'letter', char: 'A', emoji: '🍎', word: 'Apple', path: "M 50,10 L 15,90 M 50,10 L 85,90 M 25,65 L 75,65" },
+            { type: 'letter', char: 'B', emoji: '🐻', word: 'Bear', path: "M 30,10 L 30,90 M 30,10 C 80,10 80,45 30,45 C 80,45 80,90 30,90" },
+            { type: 'letter', char: 'C', emoji: '🐱', word: 'Cat', path: "M 80,25 C 70,10 20,10 20,50 C 20,90 70,90 80,75" },
+            { type: 'number', num: 1, name: 'MỘT', emoji: '🐶', anims: ['🐶'] },
+            { type: 'number', num: 2, name: 'HAI', emoji: '🐱', anims: ['🐱', '🐱'] },
+            { type: 'number', num: 3, name: 'BA', emoji: '🐰', anims: ['🐰', '🐰', '🐰'] }
+        ];
+
+        let index = 0;
+        let playing = false;
+        let timer = null;
+        const container = document.getElementById('container');
+
+        function render() {
+            const item = DATA[index];
+            document.getElementById('curr').innerText = index + 1;
+            document.getElementById('total').innerText = DATA.length;
+            
+            const oldCard = container.querySelector('.card');
+            if (oldCard) {
+                oldCard.classList.remove('active');
+                oldCard.classList.add('exit');
+                setTimeout(() => oldCard.remove(), 500);
+            }
+
+            const card = document.createElement('div');
+            card.className = `card active color-${(index % 4) + 1}`;
+            
+            // Tốc độ vẽ mặc định là 3 giây để bé đếm
+            card.style.setProperty('--draw-speed', '3s');
+
+            if (item.type === 'letter') {
+                card.innerHTML = `
+                    <div class="emoji">${item.emoji}</div>
+                    <svg class="letter-svg" viewBox="0 0 100 100">
+                        <path class="draw-path" d="${item.path}"></path>
+                    </svg>
+                    <div class="word">${item.word}</div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="number-text">${item.num}</div>
+                    <div class="word">${item.name}</div>
+                    <div class="animals">
+                        ${item.anims.map((a, i) => `<span class="animal" style="animation-delay: ${i*0.2}s">${a}</span>`).join('')}
+                    </div>
+                `;
+            }
+
+            container.appendChild(card);
+        }
+
+        function next() {
+            index = (index + 1) % DATA.length;
+            render();
+        }
+
+        function prev() {
+            index = (index - 1 + DATA.length) % DATA.length;
+            render();
+        }
+
+        function togglePlay() {
+            playing = !playing;
+            document.getElementById('playBtn').innerText = playing ? '⏸' : '▶';
+            if (playing) {
+                timer = setInterval(next, 5000); // 5 giây đổi thẻ để bé kịp đếm
+            } else {
+                clearInterval(timer);
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>
